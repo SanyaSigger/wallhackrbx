@@ -15,6 +15,7 @@ local ThemeManager = {} do
 
 	ThemeManager.Library = nil
 	ThemeManager.BuiltInThemes = {
+		['Sand'] 		= { 0, httpService:JSONDecode('{"FontColor":"ffffff","MainColor":"3b3b3b","AccentColor":"fff56d","BackgroundColor":"232323","OutlineColor":"515151"}') },
 		['Default'] 		= { 1, httpService:JSONDecode('{"FontColor":"f4f9ff","MainColor":"2c5b99","AccentColor":"53ace8","BackgroundColor":"1f4170","OutlineColor":"91cdf4"}') },
 		['BBot'] 			= { 2, httpService:JSONDecode('{"FontColor":"ffffff","MainColor":"1e1e1e","AccentColor":"7e48a3","BackgroundColor":"232323","OutlineColor":"141414"}') },
 		['Fatality']		= { 3, httpService:JSONDecode('{"FontColor":"ffffff","MainColor":"1e1842","AccentColor":"c50754","BackgroundColor":"191335","OutlineColor":"3c355d"}') },
