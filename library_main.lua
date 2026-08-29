@@ -31,16 +31,16 @@ local Library = {
 
     HudRegistry = {};
 
-    -- Warm, slightly faded colours keep the menu closer to an old desk / brass-panel look.
-    FontColor = Color3.fromRGB(232, 218, 188);
-    MainColor = Color3.fromRGB(55, 42, 29);
-    BackgroundColor = Color3.fromRGB(35, 27, 19);
-    AccentColor = Color3.fromRGB(173, 126, 65);
-    OutlineColor = Color3.fromRGB(103, 78, 49);
+    -- Luna-blue, high-contrast colours evoke the classic Windows XP shell.
+    FontColor = Color3.fromRGB(244, 249, 255);
+    MainColor = Color3.fromRGB(44, 91, 153);
+    BackgroundColor = Color3.fromRGB(31, 65, 112);
+    AccentColor = Color3.fromRGB(83, 172, 232);
+    OutlineColor = Color3.fromRGB(145, 205, 244);
     RiskColor = Color3.fromRGB(255, 50, 50),
 
     Black = Color3.new(0, 0, 0);
-    Font = Enum.Font.Gotham,
+    Font = Enum.Font.Code,
 
     OpenedFrames = {};
     DependencyBoxes = {};
@@ -162,6 +162,24 @@ function Library:CreateLabel(Properties, IsHud)
     }, IsHud);
 
     return Library:Create(_Instance, Properties);
+end;
+
+function Library:SetFont(Font)
+    local SelectedFont = Font;
+
+    if type(Font) == 'string' then
+        SelectedFont = Enum.Font[Font];
+    end
+
+    assert(typeof(SelectedFont) == 'EnumItem', 'SetFont: Font must be a valid Enum.Font value or name.')
+
+    Library.Font = SelectedFont;
+
+    for _, Instance in next, Library.ScreenGui:GetDescendants() do
+        if Instance:IsA('TextLabel') or Instance:IsA('TextBox') then
+            Instance.Font = SelectedFont;
+        end
+    end
 end;
 
 function Library:MakeDraggable(Instance, Cutoff)
@@ -1408,6 +1426,147 @@ do
         Groupbox:Resize();
 
         return Label;
+    end;
+
+    -- A compact visual reference for ESP settings. An optional screenshot can sit behind it.
+    function Funcs:AddESPPreview(Info)
+        Info = Info or {}
+
+        local Groupbox = self;
+        local Container = Groupbox.Container;
+        local Height = math.clamp(tonumber(Info.Height) or 120, 80, 220);
+        local Preview = {};
+
+        local PreviewFrame = Library:Create('Frame', {
+            BackgroundColor3 = Library.MainColor;
+            BackgroundTransparency = 0.2;
+            BorderColor3 = Library.OutlineColor;
+            ClipsDescendants = true;
+            Size = UDim2.new(1, -4, 0, Height);
+            ZIndex = 5;
+            Parent = Container;
+        });
+
+        Library:AddToRegistry(PreviewFrame, {
+            BackgroundColor3 = 'MainColor';
+            BorderColor3 = 'OutlineColor';
+        });
+
+        local function CreatePreviewImage(Image, Transparency)
+            return Library:Create('ImageLabel', {
+                BackgroundTransparency = 1;
+                Image = Image;
+                ImageTransparency = math.clamp(tonumber(Transparency) or 0.45, 0, 1);
+                ScaleType = Enum.ScaleType.Crop;
+                Size = UDim2.fromScale(1, 1);
+                ZIndex = 5;
+                Parent = PreviewFrame;
+            });
+        end
+
+        if type(Info.Image) == 'string' and Info.Image ~= '' then
+            Preview.Image = CreatePreviewImage(Info.Image, Info.ImageTransparency);
+        end
+
+        local Header = Library:CreateLabel({
+            BackgroundColor3 = Library.BackgroundColor;
+            BackgroundTransparency = 0.2;
+            Size = UDim2.new(1, 0, 0, 17);
+            Text = Info.Title or 'ESP PREVIEW';
+            TextSize = 12;
+            TextXAlignment = Enum.TextXAlignment.Center;
+            ZIndex = 6;
+            Parent = PreviewFrame;
+        });
+
+        Library:AddToRegistry(Header, {
+            BackgroundColor3 = 'BackgroundColor';
+        });
+
+        local TargetBox = Library:Create('Frame', {
+            BackgroundTransparency = 1;
+            BorderColor3 = Library.AccentColor;
+            Position = UDim2.new(0.5, -27, 0, 43);
+            Size = UDim2.fromOffset(54, 58);
+            ZIndex = 6;
+            Parent = PreviewFrame;
+        });
+
+        Library:AddToRegistry(TargetBox, {
+            BorderColor3 = 'AccentColor';
+        });
+
+        local TargetName = Library:CreateLabel({
+            Position = UDim2.new(0, -26, 0, -15);
+            Size = UDim2.new(1, 52, 0, 14);
+            Text = Info.Name or 'enemy_01';
+            TextSize = 12;
+            TextXAlignment = Enum.TextXAlignment.Center;
+            ZIndex = 7;
+            Parent = TargetBox;
+        });
+
+        local HealthTrack = Library:Create('Frame', {
+            BackgroundColor3 = Color3.fromRGB(37, 37, 37);
+            BorderColor3 = Color3.new(0, 0, 0);
+            Position = UDim2.new(0, -7, 0, 0);
+            Size = UDim2.fromOffset(4, 58);
+            ZIndex = 7;
+            Parent = TargetBox;
+        });
+
+        local HealthFill = Library:Create('Frame', {
+            AnchorPoint = Vector2.new(0, 1);
+            BackgroundColor3 = Color3.fromRGB(99, 191, 102);
+            BorderSizePixel = 0;
+            Position = UDim2.new(0, 0, 1, -1);
+            Size = UDim2.new(1, -2, 0.84, -2);
+            ZIndex = 8;
+            Parent = HealthTrack;
+        });
+
+        local Distance = Library:CreateLabel({
+            Position = UDim2.new(0, -25, 1, 2);
+            Size = UDim2.new(1, 50, 0, 13);
+            Text = Info.Distance or '64 studs';
+            TextSize = 11;
+            TextXAlignment = Enum.TextXAlignment.Center;
+            ZIndex = 7;
+            Parent = TargetBox;
+        });
+
+        function Preview:SetImage(Image, Transparency)
+            assert(type(Image) == 'string', 'SetImage: Image must be an asset URI string.')
+
+            if not Preview.Image then
+                Preview.Image = CreatePreviewImage(Image, Transparency)
+            else
+                Preview.Image.Image = Image
+
+                if Transparency ~= nil then
+                    Preview.Image.ImageTransparency = math.clamp(tonumber(Transparency) or 0, 0, 1)
+                end
+            end
+        end
+
+        function Preview:SetName(Name)
+            TargetName.Text = tostring(Name)
+        end
+
+        function Preview:SetDistance(Text)
+            Distance.Text = tostring(Text)
+        end
+
+        function Preview:SetHealth(Health)
+            HealthFill.Size = UDim2.new(1, -2, math.clamp((tonumber(Health) or 0) / 100, 0, 1), -2)
+        end
+
+        Preview.Frame = PreviewFrame;
+        Preview:SetHealth(Info.Health or 84);
+        Groupbox:AddBlank(5);
+        Groupbox:Resize();
+
+        return Preview;
     end;
 
     function Funcs:AddButton(...)
@@ -2807,7 +2966,7 @@ do
         Position = UDim2.fromOffset(5, 2),
         TextXAlignment = Enum.TextXAlignment.Left,
 
-        Text = 'Keybinds';
+        Text = 'SYSTEM STATUS';
         ZIndex = 104;
         Parent = KeybindInner;
     });
@@ -2832,8 +2991,13 @@ do
     })
 
     Library.KeybindFrame = KeybindOuter;
+    Library.KeybindLabel = KeybindLabel;
     Library.KeybindContainer = KeybindContainer;
     Library:MakeDraggable(KeybindOuter);
+end;
+
+function Library:SetKeybindText(Text)
+    Library.KeybindLabel.Text = tostring(Text);
 end;
 
 function Library:SetWatermarkVisibility(Bool)
@@ -2953,6 +3117,12 @@ function Library:CreateWindow(...)
     if type(Config.Title) ~= 'string' then Config.Title = 'No title' end
     if type(Config.TabPadding) ~= 'number' then Config.TabPadding = 0 end
     if type(Config.MenuFadeTime) ~= 'number' then Config.MenuFadeTime = 0.2 end
+    if type(Config.BackgroundImage) ~= 'string' then Config.BackgroundImage = "rbxassetid://1049597384" end
+    if type(Config.BackgroundImageTransparency) ~= 'number' then Config.BackgroundImageTransparency = 0.15 end
+    if type(Config.PanelTransparency) ~= 'number' then Config.PanelTransparency = 0.55 end
+
+    Config.BackgroundImageTransparency = math.clamp(Config.BackgroundImageTransparency, 0, 1)
+    Config.PanelTransparency = math.clamp(Config.PanelTransparency, 0, 1)
 
     if typeof(Config.Position) ~= 'UDim2' then Config.Position = UDim2.fromOffset(175, 50) end
     if typeof(Config.Size) ~= 'UDim2' then Config.Size = UDim2.fromOffset(550, 600) end
@@ -2964,6 +3134,8 @@ function Library:CreateWindow(...)
 
     local Window = {
         Tabs = {};
+        PanelElements = {};
+        PanelTransparency = Config.PanelTransparency;
     };
 
     local Outer = Library:Create('Frame', {
@@ -2992,7 +3164,7 @@ function Library:CreateWindow(...)
         BackgroundColor3 = 'MainColor';
     });
 
-    -- Deliberately the only outline on the window: an understated brass rule across the top.
+    -- Deliberately the only outline on the window: a subtle Luna-blue rule across the top.
     local TopOutline = Library:Create('Frame', {
         BackgroundColor3 = Library.AccentColor;
         BorderSizePixel = 0;
@@ -3063,7 +3235,9 @@ function Library:CreateWindow(...)
     local TabContainer = Library:Create('ImageLabel', {
         BackgroundColor3 = Library.MainColor;
         BorderColor3 = Library.OutlineColor;
-        Image = "http://www.roblox.com/asset/?id=18300506962";
+        Image = Config.BackgroundImage;
+        ImageTransparency = Config.BackgroundImageTransparency;
+        ScaleType = Enum.ScaleType.Crop;
         Position = UDim2.new(0, 8, 0, 30);
         Size = UDim2.new(1, -16, 1, -38);
         ZIndex = 2;
@@ -3075,6 +3249,36 @@ function Library:CreateWindow(...)
         BackgroundColor3 = 'MainColor';
         BorderColor3 = 'OutlineColor';
     });
+
+    local function RegisterPanel(Element)
+        table.insert(Window.PanelElements, Element)
+        Element.BackgroundTransparency = Window.PanelTransparency
+        return Element
+    end
+
+    function Window:SetPanelTransparency(Transparency)
+        Window.PanelTransparency = math.clamp(tonumber(Transparency) or 0.5, 0, 1)
+
+        for _, Element in next, Window.PanelElements do
+            Element.BackgroundTransparency = Window.PanelTransparency
+        end
+    end
+
+    function Window:SetBackgroundImage(Image, Transparency)
+        assert(type(Image) == 'string', 'SetBackgroundImage: Image must be an asset URI string.')
+        TabContainer.Image = Image
+
+        if Transparency ~= nil then
+            TabContainer.ImageTransparency = math.clamp(tonumber(Transparency) or 0, 0, 1)
+        end
+    end
+
+    function Window:SetBackgroundImageTransparency(Transparency)
+        TabContainer.ImageTransparency = math.clamp(tonumber(Transparency) or 0, 0, 1)
+    end
+
+    RegisterPanel(MainSectionOuter)
+    RegisterPanel(MainSectionInner)
 
     function Window:SetWindowTitle(Title)
         WindowLabel.Text = Title;
@@ -3100,6 +3304,8 @@ function Library:CreateWindow(...)
             BackgroundColor3 = 'BackgroundColor';
             BorderColor3 = 'OutlineColor';
         });
+
+        RegisterPanel(TabButton)
 
         local TabButtonLabel = Library:CreateLabel({
             Position = UDim2.new(0, 0, 0, 0);
@@ -3222,6 +3428,8 @@ function Library:CreateWindow(...)
                 BorderColor3 = 'OutlineColor';
             });
 
+            RegisterPanel(BoxOuter)
+
             local BoxInner = Library:Create('Frame', {
                 BackgroundColor3 = Library.BackgroundColor;
                 BorderColor3 = Color3.new(0, 0, 0);
@@ -3236,6 +3444,8 @@ function Library:CreateWindow(...)
             Library:AddToRegistry(BoxInner, {
                 BackgroundColor3 = 'BackgroundColor';
             });
+
+            RegisterPanel(BoxInner)
 
             local Highlight = Library:Create('Frame', {
                 BackgroundColor3 = Library.AccentColor;
@@ -3324,6 +3534,8 @@ function Library:CreateWindow(...)
                 BorderColor3 = 'OutlineColor';
             });
 
+            RegisterPanel(BoxOuter)
+
             local BoxInner = Library:Create('Frame', {
                 BackgroundColor3 = Library.BackgroundColor;
                 BorderColor3 = Color3.new(0, 0, 0);
@@ -3338,6 +3550,8 @@ function Library:CreateWindow(...)
             Library:AddToRegistry(BoxInner, {
                 BackgroundColor3 = 'BackgroundColor';
             });
+
+            RegisterPanel(BoxInner)
 
             local Highlight = Library:Create('Frame', {
                 BackgroundColor3 = Library.AccentColor;
