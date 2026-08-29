@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Delta | Official Cheat Tool</title>
+    <style>
+        /* Base terminal theme */
+        body {
+            background-color: #0d1117;
+            color: #c9d1d9;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-image: radial-gradient(circle at center, #161b22 0%, #0d1117 100%);
+        }
+        
+        /* Main container styling */
+        .container {
+            background-color: rgba(22, 27, 34, 0.8);
+            border: 1px solid #30363d;
+            border-radius: 10px;
+            padding: 40px;
+            max-width: 650px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 0 25px rgba(88, 166, 255, 0.1);
+            backdrop-filter: blur(5px);
+        }
+
+        /* Neon tech heading */
+        h1 {
+            color: #58a6ff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 0;
+            text-shadow: 0 0 15px rgba(88, 166, 255, 0.4);
+        }
+
+        .subtitle {
+            color: #3fb950;
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 1em;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            color: #8b949e;
+        }
+
+        /* Code block layout */
+        .code-box {
+            background-color: #010409;
+            border: 1px solid #30363d;
+            border-left: 4px solid #58a6ff;
+            padding: 15px 20px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-align: left;
+        }
+
+        code {
+            color: #ff7b72;
+            font-size: 1.1em;
+            font-weight: bold;
+            word-break: break-all;
+            margin-right: 15px;
+            letter-spacing: 1px;
+        }
+
+        /* Copy button styling */
+        button {
+            background-color: #21262d;
+            color: #c9d1d9;
+            border: 1px solid #30363d;
+            padding: 10px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #30363d;
+            color: #58a6ff;
+            border-color: #8b949e;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>wallhack.rbx</h1>
+    <div class="subtitle">free keyless project delta script</div>
+    <p>the script features very cool functions but its in beta!</p>
+
+    <div class="code-box">
+        <code id="script-content">loadstring(game:HttpGet("https://raw.githubusercontent.com/SanyaSigger/wallhackrbx/refs/heads/main/obf_Er97TP4C0V0Bo7j7RF0jroVGVu8rnIW7sYdaLmT3OMW07TE1kkYp8KimqL50L0LT.lua"))</code>
+        <button id="copy-btn" onclick="copyCode()">Copy</button>
+    </div>
+</div>
+
+<script>
+    function copyCode() {
+        // Get the text content from the code element
+        const codeText = document.getElementById("script-content").innerText;
+        const copyBtn = document.getElementById("copy-btn");
+        
+        // Use the Clipboard API to copy the text
+        navigator.clipboard.writeText(codeText).then(() => {
+            // Visual feedback
+            const originalText = copyBtn.innerText;
+            copyBtn.innerText = "Copied!";
+            copyBtn.style.color = "#3fb950";
+            
+            // Revert back after 2 seconds
+            setTimeout(() => {
+                copyBtn.innerText = originalText;
+                copyBtn.style.color = "#c9d1d9";
+            }, 2000);
+        }).catch(err => {
+            console.error('Failed to copy text: ', err);
+            copyBtn.innerText = "Error";
+        });
+    }
+</script>
+
+</body>
+</html>
