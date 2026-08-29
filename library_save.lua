@@ -10,7 +10,7 @@ if not Toggles then
 	Toggles = {}
 end
 local SaveManager = {} do
-	SaveManager.Folder = 'LinoriaLibSettings'
+	SaveManager.Folder = 'wallhackrbx'
 	SaveManager.Ignore = {}
 	SaveManager.Parser = {
 		Toggle = {
@@ -131,6 +131,14 @@ local SaveManager = {} do
 		local success, decoded = pcall(httpService.JSONDecode, httpService, readfile(file))
 		if not success then return false, 'decode error' end
 
+		return self:ApplyDecodedConfig(decoded)
+	end
+
+	function SaveManager:ApplyDecodedConfig(decoded)
+		if type(decoded) ~= 'table' or type(decoded.objects) ~= 'table' then
+			return false, 'invalid config format'
+		end
+
 		for _, option in next, decoded.objects do
 			if self.Parser[option.type] then
 				task.spawn(function() self.Parser[option.type].Load(option.idx, option) end) -- task.spawn() so the config loading wont get stuck.
@@ -138,6 +146,19 @@ local SaveManager = {} do
 		end
 
 		return true
+	end
+
+	function SaveManager:LoadFromText(text)
+		if not text or type(text) ~= 'string' or text:gsub('%s', '') == '' then
+			return false, 'no config JSON provided'
+		end
+
+		local success, decoded = pcall(httpService.JSONDecode, httpService, text)
+		if not success then
+			return false, 'failed to decode JSON'
+		end
+
+		return self:ApplyDecodedConfig(decoded)
 	end
 
 	function SaveManager:IgnoreThemeSettings()
@@ -267,6 +288,20 @@ local SaveManager = {} do
 			self.Library:Notify(string.format('Set %q to auto load', name))
 		end)
 
+		section:AddDivider()
+
+		section:AddInput('SaveManager_ImportJSON', { Text = 'Import config from text', Placeholder = 'Paste config JSON here...' })
+		section:AddButton('Load from text', function()
+			local text = Options.SaveManager_ImportJSON.Value
+
+			local success, err = self:LoadFromText(text)
+			if not success then
+				return self.Library:Notify('Failed to load from text: ' .. tostring(err), 3)
+			end
+
+			self.Library:Notify('Loaded config from text', 2)
+		end)
+
 		SaveManager.AutoloadLabel = section:AddLabel('Current autoload config: none', true)
 
 		if isfile(self.Folder .. '/settings/autoload.txt') then
@@ -274,7 +309,7 @@ local SaveManager = {} do
 			SaveManager.AutoloadLabel:SetText('Current autoload config: ' .. name)
 		end
 
-		SaveManager:SetIgnoreIndexes({ 'SaveManager_ConfigList', 'SaveManager_ConfigName' })
+		SaveManager:SetIgnoreIndexes({ 'SaveManager_ConfigList', 'SaveManager_ConfigName', 'SaveManager_ImportJSON' })
 	end
 
 	function SaveManager:SetOptionsTEMP(_Options, _Toggles)
