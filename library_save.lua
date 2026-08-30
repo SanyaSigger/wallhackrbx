@@ -12,6 +12,7 @@ end
 local SaveManager = {} do
 	SaveManager.Folder = 'wallhackrbx'
 	SaveManager.Ignore = {}
+	SaveManager.Windows = {}
 	SaveManager.Parser = {
 		Toggle = {
 			Save = function(idx, object) 
@@ -74,6 +75,17 @@ local SaveManager = {} do
 				end
 			end,
 		},
+		WindowPosition = {
+			Save = function(idx, object)
+				return { type = 'WindowPosition', idx = idx, x = math.floor(object.Position.X.Offset + 0.5), y = math.floor(object.Position.Y.Offset + 0.5) }
+			end,
+			Load = function(idx, data)
+				local frame = SaveManager.Windows[idx]
+				if frame and frame.Position and type(data.x) == 'number' and type(data.y) == 'number' then
+					frame.Position = UDim2.new(0, data.x, 0, data.y)
+				end
+			end,
+		},
 	}
 
 	function SaveManager:SetIgnoreIndexes(list)
@@ -85,6 +97,10 @@ local SaveManager = {} do
 	function SaveManager:SetFolder(folder)
 		self.Folder = folder;
 		self:BuildFolderTree()
+	end
+
+	function SaveManager:RegisterWindow(name, frame)
+		self.Windows[name] = frame
 	end
 
 	function SaveManager:Save(name)
@@ -110,6 +126,12 @@ local SaveManager = {} do
 
 			table.insert(data.objects, self.Parser[option.Type].Save(idx, option))
 		end	
+
+		for idx, frame in next, self.Windows or {} do
+			if frame and frame.Position then
+				table.insert(data.objects, self.Parser.WindowPosition.Save(idx, frame))
+			end
+		end
 
 		local success, encoded = pcall(httpService.JSONEncode, httpService, data)
 		if not success then

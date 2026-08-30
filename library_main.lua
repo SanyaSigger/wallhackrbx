@@ -3134,6 +3134,7 @@ function Library:CreateWindow(...)
 
     local Window = {
         Tabs = {};
+        TabCount = 0;
         PanelElements = {};
         PanelTransparency = Config.PanelTransparency;
     };
@@ -3225,9 +3226,9 @@ function Library:CreateWindow(...)
     });
 
     local TabListLayout = Library:Create('UIListLayout', {
-        Padding = UDim.new(0, Config.TabPadding);
+        Padding = UDim.new(0, 0);
         FillDirection = Enum.FillDirection.Horizontal;
-        HorizontalAlignment = Enum.HorizontalAlignment.Center;
+        HorizontalAlignment = Enum.HorizontalAlignment.Left;
         SortOrder = Enum.SortOrder.LayoutOrder;
         Parent = TabArea;
     });
@@ -3730,7 +3731,17 @@ function Library:CreateWindow(...)
             Tab:ShowTab();
         end;
 
+        Tab.Button = TabButton;
         Window.Tabs[Name] = Tab;
+
+        -- Resize all tab buttons so the whole tab area line is covered evenly.
+        Window.TabCount = Window.TabCount + 1;
+        for _, T in next, Window.Tabs do
+            if T.Button then
+                T.Button.Size = UDim2.new(1 / Window.TabCount, 0, 1, 0);
+            end;
+        end;
+
         return Tab;
     end;
 
