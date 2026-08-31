@@ -162,8 +162,14 @@ local SaveManager = {} do
 		end
 
 		for _, option in next, decoded.objects do
-			if self.Parser[option.type] then
-				task.spawn(function() self.Parser[option.type].Load(option.idx, option) end) -- task.spawn() so the config loading wont get stuck.
+			local parser = (type(option) == 'table' and option.type) and self.Parser[option.type]
+			if parser then
+				task.spawn(function() -- task.spawn() so the config loading wont get stuck.
+					local ok, err = pcall(parser.Load, option.idx, option)
+					if not ok then
+						warn(('[SaveManager] failed to load %s %q: %s'):format(tostring(option.type), tostring(option.idx), tostring(err)))
+					end
+				end)
 			end
 		end
 
