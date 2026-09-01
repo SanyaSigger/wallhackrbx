@@ -31,12 +31,12 @@ local Library = {
 
     HudRegistry = {};
 
-    -- Luna-blue, high-contrast colours evoke the classic Windows XP shell.
+    -- Cooler modern dark-blue styling with the same font family and tighter framing.
     FontColor = Color3.fromRGB(244, 249, 255);
-    MainColor = Color3.fromRGB(44, 91, 153);
-    BackgroundColor = Color3.fromRGB(31, 65, 112);
-    AccentColor = Color3.fromRGB(83, 172, 232);
-    OutlineColor = Color3.fromRGB(145, 205, 244);
+    MainColor = Color3.fromRGB(18, 23, 33);
+    BackgroundColor = Color3.fromRGB(11, 15, 22);
+    AccentColor = Color3.fromRGB(103, 127, 255);
+    OutlineColor = Color3.fromRGB(68, 84, 110);
     RiskColor = Color3.fromRGB(255, 50, 50),
 
     Black = Color3.new(0, 0, 0);
@@ -3173,7 +3173,7 @@ function Library:CreateWindow(...)
     local TopOutline = Library:Create('Frame', {
         BackgroundColor3 = Library.AccentColor;
         BorderSizePixel = 0;
-        Size = UDim2.new(1, 0, 0, 2);
+        Size = UDim2.new(1, 0, 0, 1);
         ZIndex = 2;
         Parent = Inner;
     });
@@ -3183,10 +3183,10 @@ function Library:CreateWindow(...)
     });
 
     local WindowLabel = Library:CreateLabel({
-        Position = UDim2.new(0, 0, 0, 2);
-        Size = UDim2.new(1, 0, 0, 25);
+        Position = UDim2.new(0, 14, 0, 2);
+        Size = UDim2.new(1, -20, 0, 22);
         Text = Config.Title or '';
-        TextXAlignment = Enum.TextXAlignment.Center;
+        TextXAlignment = Enum.TextXAlignment.Left;
         ZIndex = 1;
         Parent = Inner;
         RichText = true;
@@ -3196,8 +3196,8 @@ function Library:CreateWindow(...)
     local MainSectionOuter = Library:Create('Frame', {
         BackgroundColor3 = Library.BackgroundColor;
         BorderColor3 = Library.OutlineColor;
-        Position = UDim2.new(0, 8, 0, 27);
-        Size = UDim2.new(1, -16, 1, -35);
+        Position = UDim2.new(0, 6, 0, 26);
+        Size = UDim2.new(1, -12, 1, -34);
         ZIndex = 1;
         Parent = Inner;
     });
@@ -3223,8 +3223,8 @@ function Library:CreateWindow(...)
 
     local TabArea = Library:Create('Frame', {
         BackgroundTransparency = 1;
-        Position = UDim2.new(0, 8, 0, 8);
-        Size = UDim2.new(1, -16, 0, 21);
+        Position = UDim2.new(0, 8, 0, 6);
+        Size = UDim2.new(1, -16, 0, 18);
         ZIndex = 1;
         Parent = MainSectionInner;
     });
@@ -3243,8 +3243,8 @@ function Library:CreateWindow(...)
         Image = Config.BackgroundImage;
         ImageTransparency = Config.BackgroundImageTransparency;
         ScaleType = Enum.ScaleType.Crop;
-        Position = UDim2.new(0, 8, 0, 30);
-        Size = UDim2.new(1, -16, 1, -38);
+        Position = UDim2.new(0, 8, 0, 26);
+        Size = UDim2.new(1, -16, 1, -34);
         ZIndex = 2;
         Parent = MainSectionInner;
     });
@@ -3421,7 +3421,7 @@ function Library:CreateWindow(...)
             local BoxOuter = Library:Create('Frame', {
                 BackgroundColor3 = Library.BackgroundColor;
                 BorderColor3 = Library.OutlineColor;
-                BackgroundTransparency = 0.5;
+                BackgroundTransparency = 0.45;
                 BorderMode = Enum.BorderMode.Inset;
                 Size = UDim2.new(1, 0, 0, 507 + 2);
                 ZIndex = 2;
@@ -3455,7 +3455,7 @@ function Library:CreateWindow(...)
             local Highlight = Library:Create('Frame', {
                 BackgroundColor3 = Library.AccentColor;
                 BorderSizePixel = 0;
-                Size = UDim2.new(1, 0, 0, 2);
+                Size = UDim2.new(1, 0, 0, 1);
                 ZIndex = 5;
                 Parent = BoxInner;
             });
@@ -3465,19 +3465,19 @@ function Library:CreateWindow(...)
             });
 
             local GroupboxLabel = Library:CreateLabel({
-                Size = UDim2.new(1, 0, 0, 18);
-                Position = UDim2.new(0, 4, 0, 2);
-                TextSize = 14;
+                Size = UDim2.new(1, 0, 0, 16);
+                Position = UDim2.new(0, 8, 0, 2);
+                TextSize = 13;
                 Text = Info.Name;
-                TextXAlignment = Enum.TextXAlignment.Center;
+                TextXAlignment = Enum.TextXAlignment.Left;
                 ZIndex = 5;
                 Parent = BoxInner;
             });
 
             local Container = Library:Create('Frame', {
                 BackgroundTransparency = 1;
-                Position = UDim2.new(0, 4, 0, 20);
-                Size = UDim2.new(1, -4, 1, -20);
+                Position = UDim2.new(0, 6, 0, 18);
+                Size = UDim2.new(1, -6, 1, -18);
                 ZIndex = 1;
                 Parent = BoxInner;
             });
